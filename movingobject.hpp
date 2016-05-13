@@ -2,8 +2,7 @@
 #define MOVINGOBJECT_HPP
 
 #include "graphicsobject.hpp"
-
-#include <coordinate.h>
+#include "point.hpp"
 
 #define MOVE_INCREMENT 3
 #define NUM_LIVES_START 3
@@ -11,13 +10,13 @@
 class MovingObject : public GraphicsObject
 {
 protected:
-	Coordinate c;
+	Point p;
 
 public:
 	MovingObject();
 
-	void setCoordinate(const Coordinate& c) { this->c = c; }
-	Coordinate getCoordinate() const { return c; }
+	void setPoint(const Point& p) { this->p = p; }
+	Point getPoint() const { return p; }
 
 	virtual void draw() = 0;
 	virtual void update() = 0;

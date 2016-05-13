@@ -1,12 +1,19 @@
 #include <iostream>
+#include <new>
 #include <string>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
+#include <unistd.h>
+
+#include "gamewindow.hpp"
+#include "keyboardhandler.hpp"
+// #include "point.hpp"
+// #include "velocity.hpp"
 
 using namespace std;
 
-#define WIDTH 640
-#define HEIGHT 480
+const Uint16 WIDTH = 640;
+const Uint16 HEIGHT = 480;
+
+GameWindow* gw = nullptr;
 
 void errorQuit(const string msg, const int errorNum)
 {
@@ -15,31 +22,37 @@ void errorQuit(const string msg, const int errorNum)
 	exit(errorNum);
 }
 
+void mainloop() 
+{
+	while (gw->gameIsRunning())
+	{
+		gw->update();
+		gw->draw();
+	}
+}
+
 int main()
 {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0)
+	try
 	{
-		cout << "SDL_Init Error: " << SDL_GetError() << endl;
-		return 1;
+		gw = new GameWindow("Space Invaders", WIDTH, HEIGHT);
+
+		mainloop();
+
+		delete gw;
+		
+		gw = nullptr;
 	}
-
-	SDL_Window *window = SDL_CreateWindow("Space Invaders", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
-
-	if (window == nullptr)
+	catch (const SDLError ex)
 	{
-		errorQuit("SDL_CreateWindow Error: ", 2);
+		cerr << ex.message << endl;
+		return ex.errorNum;
 	}
-
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-	if (renderer == nullptr)
+	catch (bad_alloc& ba)
 	{
-		errorQuit("SDL_CreateRenderer Error: ", 3);
+		cerr << "Bad memory allocation: " << ba.what() << ". Terminating.\n";
+		return 255;
 	}
-
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
 
 	return 0;
 }

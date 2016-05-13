@@ -6,8 +6,9 @@ class Velocity
 private:
 	int dX, dY;
 public:
-	Velocity();
-	Velocity(int dX, int dY);
+	Velocity() {dX = 0; dY = 0; }
+	Velocity(const int dX, const int dY) { this->dX = dX; this->dY = dY; }
+	Velocity(const Velocity& v) { this->dX = v.dX; this->dY = v.dY; }
 
 	void setDX(const int dX) { this->dX = dX; }
 	void setDY(const int dY) { this->dY = dY; }
