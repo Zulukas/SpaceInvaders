@@ -45,10 +45,11 @@ public:
 	virtual void draw() = 0;
 	virtual void update() = 0;
 
-	Point getPoint() const { return p; }
-	void setPoint(const Point& p) { this->p = p; }
+	virtual Point getPoint() const { return p; }
+	virtual void setPoint(const Point& p) { this->p = p; }
 
-	void setColor(const SDL_Color color) { this->color = color; }
+	virtual void setColor(const SDL_Color color) { this->color = color; }
+	virtual SDL_Color getColor() const { return color; }
 };
 
 #endif

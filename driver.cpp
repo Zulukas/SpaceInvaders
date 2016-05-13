@@ -1,9 +1,15 @@
+
+
 #include <iostream>
 #include <new>
 #include <string>
 #include <unistd.h>
 
-#include "gamewindow.hpp"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
+// #include "gamewindow.hpp"
+#include "textobject.hpp"
 #include "keyboardhandler.hpp"
 // #include "point.hpp"
 // #include "velocity.hpp"
@@ -13,7 +19,7 @@ using namespace std;
 const Uint16 WIDTH = 640;
 const Uint16 HEIGHT = 480;
 
-GameWindow* gw = nullptr;
+// GameWindow* gw = nullptr;
 
 void errorQuit(const string msg, const int errorNum)
 {
@@ -24,35 +30,52 @@ void errorQuit(const string msg, const int errorNum)
 
 void mainloop() 
 {
-	while (gw->gameIsRunning())
-	{
-		gw->update();
-		gw->draw();
-	}
+	// while (gw->gameIsRunning())
+	// {
+	// 	gw->update();
+	// 	gw->draw();
+	// }
 }
 
 int main()
 {
-	try
-	{
-		gw = new GameWindow("Space Invaders", WIDTH, HEIGHT);
+	SDL_Window* window;
+	SDL_Renderer* renderer;
 
-		mainloop();
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	{
+		cerr << "SDL_Init Error: " << SDL_GetError() << endl;
+		exit(1);
+	}
 
-		delete gw;
-		
-		gw = nullptr;
-	}
-	catch (const SDLError ex)
+	window = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+
+	if (window == nullptr)
 	{
-		cerr << ex.message << endl;
-		return ex.errorNum;
+		cerr << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
+		exit(2);
 	}
-	catch (bad_alloc& ba)
+
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	if (renderer == nullptr)
 	{
-		cerr << "Bad memory allocation: " << ba.what() << ". Terminating.\n";
-		return 255;
+		cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+		exit(3);
 	}
+
+	if (TTF_Init() == -1)
+	{
+		cerr << "TFF_Init Error: " << SDL_GetError() << endl;
+		exit(4);
+	}
+
+	TextObject* textObj = new TextObject(&*renderer, "Hello World", 16, Point(0,0));
+	textObj->draw();
+
+	sleep(2);
+
+	delete textObj;
 
 	return 0;
 }
