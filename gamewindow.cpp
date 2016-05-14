@@ -1,169 +1,162 @@
 #include "gamewindow.hpp"
 
-// #define DEBUG
+#define DEBUG
 
-// #ifdef DEBUG
+#ifdef DEBUG
 
-// #include <iostream>
-// using namespace std;
+#include <iostream>
+using namespace std;
 
-// #endif
+#endif
 
-// #define TEXTFONT "font.ttf"
+#define TEXTFONT "font.ttf"
 
-// GameWindow::GameWindow(const char* windowName, Uint16 width, Uint16 height) throw (const SDLError) : tb(nullptr)
-// {
-// 	this->windowName = (char*)windowName;
-// 	this->width = width;
-// 	this->height = height;
+GameWindow::GameWindow(const char* windowName, Uint16 width, Uint16 height) throw (const SDLError)
+{
+	this->windowName = (char*)windowName;
+	this->width = width;
+	this->height = height;
 
-// 	manager = new FPSmanager;
-// 	SDL_initFramerate(manager);
-// 	SDL_setFramerate(manager, FRAMERATE);
+	manager = new FPSmanager;
+	SDL_initFramerate(manager);
+	SDL_setFramerate(manager, FRAMERATE);
 
-// 	gameRunning = true;
+	gameRunning = true;
 
-// 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
-// 	{
-// 		throw SDLError("SDL_Init Error: " + string(SDL_GetError()), 1);
-// 	}
+	if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
+	{
+		cerr << __LINE__ << " SDL_Init Error: " << SDL_GetError() << endl;
+		exit(1);
+	}
 
-// 	window = SDL_CreateWindow((char*)windowName, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
 
-// 	if (window == nullptr)
-// 	{
-// 		throw SDLError("SDL_CreateWindow Error: " + string(SDL_GetError()), 2);
-// 	}
+	if (window == nullptr)
+	{
+		cerr << __LINE__ << " SDL_CreateWindow Error: " << SDL_GetError() << endl;
+		exit(2);
+	}
 
-// 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-// 	if (renderer == nullptr)
-// 	{
-// 		throw SDLError("SDL_CreateRenderer Error: " + string(SDL_GetError()), 3);
-// 	}
+	cout << "Renderer: " << renderer << endl;
 
-// 	TTF_Init();
+	if (renderer == nullptr)
+	{
+		cerr << __LINE__ << " SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+		exit(3);
+	}
 
-// 	// fpsDisplay = new TextObject(
-// 	// 	renderer, 
-// 	// 	"Hello", 
-// 	// 	24, 
-// 	// 	"/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf",
-// 	// 	WHITE,
-// 	// 	Point(),
-// 	// 	50,
-// 		// 50);
+	SDL_RenderSetLogicalSize(renderer, width, height);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-// 	tb = new Textbox(renderer, 400, 200, 25, 25);
-// }
+	if (TTF_Init() == -1)
+	{
+		cerr << __LINE__ << " TFF_Init Error: " << SDL_GetError() << endl;
+		exit(4);
+	}
 
-// GameWindow::~GameWindow()
-// {
-// 	if (tb != nullptr)
-// 		delete tb;
-// 	if (manager != nullptr)
-// 		delete manager;
-// 	// delete fpsDisplay;
-// 	SDL_DestroyRenderer(renderer);
-// 	SDL_DestroyWindow(window);
-// 	SDL_Quit();
-// }
+	gfxObjects.push_back(new TextObject(renderer, "Space Invaders!", 16, Point(1, 1)));
+	gfxObjects.push_back(new LineObject(renderer, Point(0, 20), Point(width, 20)));
+	gfxObjects.push_back(new Bullet(renderer, Point(320, 480)));
+}
 
-// void GameWindow::draw()
-// {
-// 	tb->draw();
+GameWindow::~GameWindow()
+{
+	if (manager != nullptr)
+		delete manager;
 
-// 	TTF_Font* Sans = TTF_OpenFont("/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-R.ttf", 10); //this opens a font style and sets a size
-// 	// TTF_Font* Sans = TTF_OpenFont("Tahoma.ttf", 10); //this opens a font style and sets a size
+	for (int i = 0; i < gfxObjects.size(); i++)
+	{
+		if (gfxObjects[i] != nullptr)
+		{
+			delete gfxObjects[i];
+		}
+	}
 
-// 	if (Sans == nullptr)
-// 	{
-// 		cerr << "TTF_OpenFont: " << SDL_GetError() << endl;
-// 		exit(6);
-// 	}
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+}
 
-// 	SDL_Color White = {255, 255, 255};  // this is the color in rgb format, maxing out all would give you the color white, and it will be your text's color
+void GameWindow::draw()
+{
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
 
-// 	SDL_Surface* surfaceMessage = TTF_RenderText_Solid(Sans, "My text! this is really longer than it should be for this particular case...", White); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+	for (int i = 0; i < gfxObjects.size(); i++)
+	{
+		if (gfxObjects[i] == nullptr)
+			continue;
 
-// 	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, surfaceMessage); //now you can convert it into a texture
+		gfxObjects[i]->draw();
+	}
 
-// 	SDL_Rect Message_rect; //create a rect
-// 	Message_rect.x = 0;  //controls the rect's x coordinate 
-// 	Message_rect.y = 0; // controls the rect's y coordinte
-// 	Message_rect.w = 550; // controls the width of the rect
-// 	Message_rect.h = 25; // controls the height of the rect
+	SDL_RenderPresent(renderer);
 
-// //Mind you that (0,0) is on the top left of the window/screen, think a rect as the text's box, that way it would be very simple to understance
+	SDL_framerateDelay(this->manager);
+	
+}
 
-// //Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
+void GameWindow::update()
+{
+	//Check for user input first
+	while(SDL_PollEvent(&event))
+	{
+		if (event.type == SDL_QUIT)
+		{
+			gameRunning = false;
+		}
+	}
 
-// 	SDL_RenderCopy(renderer, Message, NULL, &Message_rect); 
-// 	SDL_RenderPresent(renderer);
+	#ifdef DEBUG
+	bool keyPressed = false;
+	#endif
 
-// 	// //Draw the game
-// 	// SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
-// 	// SDL_RenderClear(this->renderer);
+	if (kbHandler.leftPressed())
+	{
+		#ifdef DEBUG
+		cout << "Left key pressed ";
+		keyPressed = true;
+		#endif
+	}
+	if (kbHandler.rightPressed())
+	{
+		#ifdef DEBUG
+		cout << "Right key pressed ";
+		keyPressed = true;
+		#endif
+	}
+	if (kbHandler.spacePressed())
+	{
+		#ifdef DEBUG
+		cout << "Space bar pressed ";
+		keyPressed = true;
+		#endif
+	}
 
-// 	// SDL_SetRenderDrawColor(this->renderer, 0, 255, 0, 0);
-// 	// SDL_RenderDrawLine(this->renderer, 50, 250, 250, 250);
+	#ifdef DEBUG
+	if (keyPressed)
+	{
+		cout << endl;
+	}
+	#endif
 
-// 	// fpsDisplay->draw();
+	//Update game objects
+	for (int i = 0; i < gfxObjects.size(); i++)
+	{
+		if (gfxObjects[i] == nullptr)
+			continue;
 
-// 	// SDL_RenderPresent(this->renderer);
+		if (gfxObjects[i]->outOfBounds(Point(0, 30), Point(640, 480)))
+		{
+			cout << "DELETING\n";
+			delete gfxObjects[i];
+			gfxObjects[i] = nullptr;
+			continue;
+		}
 
-// 	// //Enforce the framerate
-// 	// #ifdef DEBUG
-// 	// cout << manager->framecount % 10 << endl;
-// 	// #endif
-// 	SDL_framerateDelay(this->manager);
-// }
+		gfxObjects[i]->update();
+	}
 
-// void GameWindow::update()
-// {
-// 	//Check for user input first
-// 	while(SDL_PollEvent(&event))
-// 	{
-// 		if (event.type == SDL_QUIT)
-// 		{
-// 			gameRunning = false;
-// 		}
-// 	}
-
-// 	#ifdef DEBUG
-// 	bool keyPressed = false;
-// 	#endif
-
-// 	if (kbHandler.leftPressed())
-// 	{
-// 		#ifdef DEBUG
-// 		cout << "Left key pressed ";
-// 		keyPressed = true;
-// 		#endif
-// 	}
-// 	if (kbHandler.rightPressed())
-// 	{
-// 		#ifdef DEBUG
-// 		cout << "Right key pressed ";
-// 		keyPressed = true;
-// 		#endif
-// 	}
-// 	if (kbHandler.spacePressed())
-// 	{
-// 		#ifdef DEBUG
-// 		cout << "Space bar pressed ";
-// 		keyPressed = true;
-// 		#endif
-// 	}
-
-// 	#ifdef DEBUG
-// 	if (keyPressed)
-// 	{
-// 		cout << endl;
-// 	}
-// 	#endif
-
-// 	//Update game objects
-
-
-// }
+}

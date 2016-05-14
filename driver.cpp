@@ -1,5 +1,3 @@
-
-
 #include <iostream>
 #include <new>
 #include <string>
@@ -8,7 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-// #include "gamewindow.hpp"
+#include "gamewindow.hpp"
 #include "textobject.hpp"
 #include "keyboardhandler.hpp"
 // #include "point.hpp"
@@ -19,7 +17,7 @@ using namespace std;
 const Uint16 WIDTH = 640;
 const Uint16 HEIGHT = 480;
 
-// GameWindow* gw = nullptr;
+GameWindow* gw = nullptr;
 
 void errorQuit(const string msg, const int errorNum)
 {
@@ -28,54 +26,58 @@ void errorQuit(const string msg, const int errorNum)
 	exit(errorNum);
 }
 
-void mainloop() 
+void mainLoop() 
 {
-	// while (gw->gameIsRunning())
-	// {
-	// 	gw->update();
-	// 	gw->draw();
-	// }
+	while (gw->gameIsRunning())
+	{
+		gw->update();
+		gw->draw();
+	}
 }
 
 int main()
 {
-	SDL_Window* window;
-	SDL_Renderer* renderer;
+	// SDL_Window* window;
+	// SDL_Renderer* renderer;
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-	{
-		cerr << "SDL_Init Error: " << SDL_GetError() << endl;
-		exit(1);
-	}
+	// if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
+	// {
+	// 	cerr << __LINE__ << " SDL_Init Error: " << SDL_GetError() << endl;
+	// 	exit(1);
+	// }
 
-	window = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+	// window = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 
-	if (window == nullptr)
-	{
-		cerr << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
-		exit(2);
-	}
+	// if (window == nullptr)
+	// {
+	// 	cerr << __LINE__ << " SDL_CreateWindow Error: " << SDL_GetError() << endl;
+	// 	exit(2);
+	// }
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	// renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	if (renderer == nullptr)
-	{
-		cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
-		exit(3);
-	}
+	// cout << "Renderer: " << renderer << endl;
 
-	if (TTF_Init() == -1)
-	{
-		cerr << "TFF_Init Error: " << SDL_GetError() << endl;
-		exit(4);
-	}
+	// if (renderer == nullptr)
+	// {
+	// 	cerr << __LINE__ << " SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+	// 	exit(3);
+	// }
 
-	TextObject* textObj = new TextObject(&*renderer, "Hello World", 16, Point(0,0));
-	textObj->draw();
+	// SDL_RenderSetLogicalSize(renderer, WIDTH, HEIGHT);
+	// SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-	sleep(2);
+	// if (TTF_Init() == -1)
+	// {
+	// 	cerr << __LINE__ << " TFF_Init Error: " << SDL_GetError() << endl;
+	// 	exit(4);
+	// }
 
-	delete textObj;
+	gw = new GameWindow("Space Invaders", WIDTH, HEIGHT);
+
+	mainLoop();
+
+	delete gw;
 
 	return 0;
 }

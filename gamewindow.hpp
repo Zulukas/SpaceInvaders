@@ -1,62 +1,65 @@
 #ifndef GAMEWINDOW_HPP
 #define GAMEWINDOW_HPP
 
-// #include <SDL2/SDL.h>
-// #include <SDL2/SDL2_gfxPrimitives.h>
-// #include <SDL2/SDL2_framerate.h>
-// #include <SDL2/SDL_ttf.h>
-// #include <iostream>
-// #include <string>
-// using std::cout;
-// using std::endl;
-// using std::string;
+#include <iostream>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL2_framerate.h>
+#include <SDL2/SDL_ttf.h>
+#include <string>
+#include <vector>
 
-// #include "keyboardhandler.hpp"
-// #include "graphicsobject.hpp"
-// #include "textobject.hpp"
-// // #include "textbox.hpp"
-// #include "point.hpp"
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
 
-// #define FRAMERATE 10
-// #define FONTLOCATION "/usr/shared/fonts/truetype/liberation/LiberationMono-Regular.ttf"
+#include "bullet.hpp"
+#include "graphicsobject.hpp"
+#include "keyboardhandler.hpp"
+#include "textobject.hpp"
+#include "lineobject.hpp"
+#include "point.hpp"
 
-// class SDLError
-// {
-// public:
-// 	const string message;
-// 	const int errorNum;
+#define FRAMERATE 30
+#define FONTLOCATION "/usr/shared/fonts/truetype/liberation/LiberationMono-Regular.ttf"
 
-// 	SDLError(const string msg, const int errNum) : message(msg), errorNum(errNum) {}
-// };
+class SDLError
+{
+public:
+	const string message;
+	const int errorNum;
 
-// class GameWindow
-// {
-// private:
-// 	SDL_Window* window;
-// 	SDL_Renderer* renderer;
+	SDLError(const string msg, const int errNum) : message(msg), errorNum(errNum) {}
+};
 
-// 	SDL_Event event;
-// 	FPSmanager *manager;
-// 	KeyboardHandler kbHandler;
+class GameWindow
+{
+private:
+	SDL_Window* window;
+	SDL_Renderer* renderer;
 
-// 	Uint16 width, height;
-// 	char* windowName;
+	SDL_Event event;
+	FPSmanager *manager;
+	KeyboardHandler kbHandler;
 
-// 	bool gameRunning;
+	Uint16 width, height;
+	char* windowName;
 
-// 	// GraphicsObject* fpsDisplay;
-// 	Textbox *tb;
+	bool gameRunning;
 
-// public: 
-// 	GameWindow(const char* windowName, 
-// 		Uint16 width, 
-// 		Uint16 height) throw (const SDLError);
-// 	~GameWindow();
+	vector<GraphicsObject*> gfxObjects;
 
-// 	void draw();
-// 	void update();
+public: 
+	GameWindow(const char* windowName, 
+		Uint16 width, 
+		Uint16 height) throw (const SDLError);
+	~GameWindow();
 
-// 	bool gameIsRunning() const { return gameRunning; }
-// };
+	void draw();
+	void update();
+
+	bool gameIsRunning() const { return gameRunning; }
+};
 
 #endif
